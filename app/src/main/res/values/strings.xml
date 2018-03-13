@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">restAuto</string>
+    <string name="logo">Logo</string>
+    <string name="nameOrder">Restaurant Order</string>
+    <string name="login">Login</string>
+    <string name="user">User</string>
+    <string name="floor">Floor</string>
+    <string name="table">Table</string>
+    <string name="status">Status</string>
+    <string name="menu">Menu</string>
+    <string name="order">Order</string>
+    <string name="update">Update</string>
+    <string name="nextC">Continue</string>
+
+    <string name="floorPrompt">Select a Floor</string>
+    <string-array name="floorChoice">
+        <item>Floor 1</item>
+        <item>Floor 2</item>
+        <item>Floor 3</item>
+        <item>Floor 4</item>
+        <item>Floor 5</item>
+    </string-array>
+
+    <string name="tablePrompt">Select a Table</string>
+    <string-array name="tableChoice">
+        <item>Table 1</item>
+        <item>Table 2</item>
+        <item>Table 3</item>
+        <item>Table 4</item>
+        <item>Table 5</item>
+    </string-array>
+
+    <string name="statusPrompt">Select a Status</string>
+    <string-array name="tableState">
+        <item>Available</item>
+        <item>Unavailable</item>
+        <item>Cleaning</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
