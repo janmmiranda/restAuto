@@ -8,14 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,floorFrag.OnFragmentInteractionListener, menuFragment.OnFragmentInteractionListener, orderFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,floorFragment.OnFragmentInteractionListener, menuFragment.OnFragmentInteractionListener, orderFragment.OnFragmentInteractionListener {
 
     private Button floorBar;
     private Button menuBar;
     private Button orderBar;
     FragmentTransaction fragmentTransaction;
     private FragmentManager fm;
-    floorFrag floor = new floorFrag();
+    floorFragment floor = new floorFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if(view == floorBar){
-            floorFrag floor = new floorFrag();
+            floorFragment floor = new floorFragment();
             fm = getFragmentManager();
             fragmentTransaction = fm.beginTransaction();
             Bundle bundle = new Bundle();

@@ -6,8 +6,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +14,23 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.io.Serializable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link floorFrag.OnFragmentInteractionListener} interface
+ * {@link floorFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link floorFrag#newInstance} factory method to
+ * Use the {@link floorFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class floorFrag extends Fragment implements menuFragment.OnFragmentInteractionListener {
+public class floorFragment extends Fragment implements menuFragment.OnFragmentInteractionListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,7 +53,7 @@ public class floorFrag extends Fragment implements menuFragment.OnFragmentIntera
     private FragmentManager fm;
     FragmentTransaction fragmentTransaction;
 
-    public floorFrag() {
+    public floorFragment() {
         // Required empty public constructor
     }
 
@@ -60,11 +63,11 @@ public class floorFrag extends Fragment implements menuFragment.OnFragmentIntera
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment floorFrag.
+     * @return A new instance of fragment floorFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static floorFrag newInstance(String param1, String param2) {
-        floorFrag fragment = new floorFrag();
+    public static floorFragment newInstance(String param1, String param2) {
+        floorFragment fragment = new floorFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -128,9 +131,13 @@ public class floorFrag extends Fragment implements menuFragment.OnFragmentIntera
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "update clicked", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "update clicked", Toast.LENGTH_SHORT).show();
 
-                updateTable(floorNum, tableNum, status);
+                try {
+                    updateTable(floorNum, tableNum, status);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -139,7 +146,11 @@ public class floorFrag extends Fragment implements menuFragment.OnFragmentIntera
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), "next clicked", Toast.LENGTH_LONG).show();
-                //updateTable(floorNum, tableNum, status);
+                try {
+                    updateTable(floorNum, tableNum, status);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 next(floorNum, tableNum);
             }
         });
@@ -160,8 +171,33 @@ public class floorFrag extends Fragment implements menuFragment.OnFragmentIntera
         fragmentTransaction.commit();
     }
 
-    private void updateTable(int floorNum, int tableNum, String status){
+    private void updateTable(int floorNum, int tableNum, String status) throws IOException {
         //talk to desktop via socket
+        Socket clientSocket = null;
+        String serverHostName = "172.31.155.62";
+        int port = 1234;
+        try {
+            clientSocket = new Socket(serverHostName, port);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Floor: ");
+        sb.append(floorNum);
+        sb.append(" , table: ");
+        sb.append(tableNum);
+        sb.append(" , status: ");
+        sb.append(status);
+
+        PrintStream printStream = new PrintStream(clientSocket.getOutputStream());
+        InputStreamReader inputStream = new InputStreamReader(clientSocket.getInputStream());
+
+        printStream.print(sb);
+        BufferedReader bufferedReader = new BufferedReader(inputStream);
+        String message = bufferedReader.readLine();
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
