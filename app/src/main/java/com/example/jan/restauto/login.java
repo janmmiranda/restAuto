@@ -12,6 +12,16 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,6 +31,7 @@ public class login extends AppCompatActivity implements View.OnClickListener{
     private EditText passwordIn;
     private Button loginBtn;
     private ProgressBar progressBar;
+    private StringBuilder pass = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,25 +68,33 @@ public class login extends AppCompatActivity implements View.OnClickListener{
         }
         String generatedPassword = hashPassword(passwordToHash);
 
-        if(checkUser(user, generatedPassword)) {
-            progressBar.setVisibility(ProgressBar.INVISIBLE);
-            //Toast.makeText(this,"success", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-        } else {
-            progressBar.setVisibility(ProgressBar.INVISIBLE);
-            Log.w("", "login failure");
-            Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_LONG).show();
-        }
-
+        checkUser(user, generatedPassword);
     }
 
-    public boolean checkUser(String user, String Password) {
-        boolean result = true;
-        /*
-        check if valid user
-         */
+    public void checkUser(String user, final String Password) {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String getUser = "http://10.0.2.2:3000/get_users?username=";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getUser);
+        sb.append(user);
+        sb.append("&password=");
+        sb.append(Password);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, getUser, null, new Response.Listener< JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        Log.v("check", "works");
+                    }
+        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_LONG).show();
+                        Log.d("error", "err");
+                    }
+        });
 
-        return result;
+        queue.add(jsonObjectRequest);
     }
 
     public String hashPassword(String password){
@@ -95,8 +114,7 @@ public class login extends AppCompatActivity implements View.OnClickListener{
 
             // Get complete hashed password in hex format
             generatedPassword = sb.toString();
-            Log.i("password", generatedPassword);
-            //System.out.println(generatedPassword);
+            //Log.i("password", generatedPassword);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
