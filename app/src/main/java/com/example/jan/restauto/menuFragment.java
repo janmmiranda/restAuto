@@ -10,7 +10,10 @@ import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 
@@ -37,6 +40,8 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
     private TextView floorid;
     private TextView tableid;
     private Button orderBtn;
+    ListView mlv;
+
     private FragmentManager fm;
     FragmentTransaction fragmentTransaction;
     public OrderObject currentOrder;
@@ -85,6 +90,10 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
+        String[] food={"Item A     price","Item B      price","Item C      price","Item D       price","Item E      price","Item F      price","Item G      price"};
+        ListAdapter ma= new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_checked,food);
+        mlv=(ListView) view.findViewById(R.id.menuList);
+        mlv.setAdapter(ma);
 
         //just for checking, you can remove below
         floorid = view.findViewById(R.id.floorId);
