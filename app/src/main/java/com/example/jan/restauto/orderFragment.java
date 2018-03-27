@@ -7,6 +7,9 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 
 /**
@@ -26,6 +29,7 @@ public class orderFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    ListView mListView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -64,7 +68,15 @@ public class orderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_order, container, false);
+        String[] orderedFood={"Item A     price","Item B      price","Item C      price","Item D       price","Item E      price","Item F      price","Item G      price"};
+        ListAdapter mAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedFood);
+        mListView=(ListView) view.findViewById(R.id.orderedFoodList);
+        mListView.setAdapter(mAdapter);
 
+        String[] allOrders={"Order 1","Order 2","Order 3","Order 4","Order 5","Order 6","Order 7"};
+        ListAdapter mAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
+        mListView=(ListView) view.findViewById(R.id.allOrdersList);
+        mListView.setAdapter(mAdapter2);
         // Inflate the layout for this fragment
         return view;
     }
