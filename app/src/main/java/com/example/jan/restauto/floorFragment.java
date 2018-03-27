@@ -173,7 +173,7 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
 
     private void updateTable(int floorNum, int tableNum, String status) throws IOException {
         //talk to desktop via socket
-        Socket clientSocket = null;
+        /*Socket clientSocket = null;
         String serverHostName = "172.31.155.62";
         int port = 1234;
         try {
@@ -198,6 +198,7 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
         BufferedReader bufferedReader = new BufferedReader(inputStream);
         String message = bufferedReader.readLine();
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        */
     }
 
     // TODO: Rename method, update argument and hook method into UI event
