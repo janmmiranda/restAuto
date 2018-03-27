@@ -10,73 +10,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:text="@string/menu"
-            android:textSize="60sp"/>
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView2"
-            android:layout_marginTop="15dp"
-            android:layout_toStartOf="@+id/floorId"
-            android:text="Floor"
-            android:textSize="30sp"/>
-
-        <TextView
-            android:id="@+id/floorId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/textView7"
-            android:layout_alignBottom="@+id/textView7"
-            android:layout_alignStart="@+id/orderBtn"
-            android:layout_marginStart="59dp"
-            android:text="TextView"
-            android:textSize="30sp"/>
-
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/textView7"
-            android:layout_below="@+id/textView7"
-            android:text="Table"
-            android:textSize="30sp"
-            />
-
-        <TextView
-            android:id="@+id/tableId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/floorId"
-            android:layout_below="@+id/floorId"
-            android:layout_marginStart="11dp"
-            android:text="TextView"
-            android:textSize="30sp"/>
-
         <Button
             android:id="@+id/orderBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignStart="@+id/textView2"
-            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="60dp"
             android:text="@string/order"
-            android:textSize="30sp"/>
+            android:textSize="30sp" />
 
         <ListView
             android:id="@+id/menuList"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_below="@+id/textView9"
+            android:layout_width="600dp"
+            android:layout_height="640dp"
+            android:layout_above="@+id/orderBtn"
             android:layout_centerHorizontal="true"
-            android:choiceMode="multipleChoice"/>
+            android:layout_marginBottom="57dp"
+            android:choiceMode="multipleChoice" />
 
     </RelativeLayout>
 </FrameLayout>

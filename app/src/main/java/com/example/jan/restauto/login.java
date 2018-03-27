@@ -79,12 +79,19 @@ public class login extends AppCompatActivity implements View.OnClickListener{
         sb.append(user);
         sb.append("&password=");
         sb.append(Password);
+        Log.d("url",sb.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, getUser, null, new Response.Listener< JSONObject>() {
+                (Request.Method.GET, sb.toString(), null, new Response.Listener< JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        Log.v("check", "works");
+                        String check = response.toString();
+                        int num = (int) check.charAt(35);
+                        Log.d("num", Integer.toString(num));
+                        if(num != 48) {
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_LONG).show();
+                        }
                     }
         }, new Response.ErrorListener() {
                     @Override

@@ -95,7 +95,7 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
         mlv=(ListView) view.findViewById(R.id.menuList);
         mlv.setAdapter(ma);
 
-        //just for checking, you can remove below
+        /*just for checking, you can remove below
         floorid = view.findViewById(R.id.floorId);
         tableid = view.findViewById(R.id.tableId);
         if(currentOrder != null){
@@ -105,7 +105,8 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
             floorid.setText("0");
             tableid.setText("0");
         }
-        //just for checking, you can remove above
+        just for checking, you can remove above
+        */
 
         //this button passes currentOrder into the next fragment
         orderBtn = view.findViewById(R.id.orderBtn);
