@@ -2,6 +2,7 @@ package com.example.jan.restauto;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +17,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FragmentTransaction fragmentTransaction;
     private FragmentManager fm;
     floorFragment floor = new floorFragment();
+    public int userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent mIntent = getIntent();
+        userID = mIntent.getIntExtra("userID", 0);
 
         floorBar = (Button) findViewById(R.id.floorBar);
         menuBar = (Button) findViewById(R.id.menuBar);
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         Bundle bundle = new Bundle();
+        bundle.putInt("userID", userID);
         floor.setArguments(bundle);
         ft.add(R.id.frameLayout, floor);
         ft.commit();

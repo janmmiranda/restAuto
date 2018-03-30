@@ -6,6 +6,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     public int floorNum = 0;
     public int tableNum = 0;
     public String status;
+    public int userID;
     public OrderObject currentOrder;
     private OnFragmentInteractionListener mListener;
     private FragmentManager fm;
@@ -78,6 +80,12 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            userID = bundle.getInt("userID");
+        }
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -159,8 +167,8 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     }
 
     private void next(int floorNum, int tableNum) {
-        currentOrder = new OrderObject(floorNum, tableNum);
-
+        currentOrder = new OrderObject(userID, floorNum, tableNum);
+        Log.d("order object", String.format("value = %d", userID));
         menuFragment menuFrag = new menuFragment();
         fm = getActivity().getFragmentManager();
         fragmentTransaction = fm.beginTransaction();

@@ -11,6 +11,8 @@ import java.util.HashMap;
  */
 
 public class OrderObject implements Parcelable {
+    //id of user
+    int userID = 0;
     //floor represents the floor user is working on
     int floor = 0;
     //table represents the table the user is serving
@@ -26,10 +28,16 @@ public class OrderObject implements Parcelable {
     constructor for object, only needs floor and table
     hashmap is initialized as blank
      */
-    public OrderObject(int floor, int table) {
+    public OrderObject(int userID, int floor, int table) {
+        this.userID = userID;
         this.floor = floor;
         this.table = table;
         orderMap = new HashMap<>();
+    }
+
+    //setter function to add userId
+    public void addUser(int id){
+        this.userID= id;
     }
 
     //setter function to add menu item and quantity to order
@@ -59,6 +67,7 @@ public class OrderObject implements Parcelable {
     //for parceable
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(userID);
         dest.writeInt(floor);
         dest.writeInt(table);
         dest.writeMap(orderMap);
@@ -76,9 +85,10 @@ public class OrderObject implements Parcelable {
 
     //for parceable
     public OrderObject(Parcel in){
-        floor      = in.readInt();
+        userID     =  in.readInt();
+        floor      =  in.readInt();
         table      =  in.readInt();
-        orderMap = new HashMap<String, Integer>();
+        orderMap   =  new HashMap<String, Integer>();
         in.readMap(orderMap, OrderObject.class.getClassLoader());
     }
 }

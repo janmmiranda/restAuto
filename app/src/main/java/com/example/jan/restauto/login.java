@@ -20,6 +20,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
@@ -31,8 +33,7 @@ public class login extends AppCompatActivity implements View.OnClickListener{
     private EditText passwordIn;
     private Button loginBtn;
     private ProgressBar progressBar;
-    private StringBuilder pass = new StringBuilder();
-
+    public  OrderObject currentOrder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,13 +68,13 @@ public class login extends AppCompatActivity implements View.OnClickListener{
             return;
         }
         String generatedPassword = hashPassword(passwordToHash);
-
+        //startActivity(new Intent(getApplicationContext(), MainActivity.class));
         checkUser(user, generatedPassword);
     }
 
     public void checkUser(String user, final String Password) {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String getUser = "http://10.0.2.2:3000/get_users?username=";
+        String getUser = "http://10.0.2.2:8080/get_users?username=";
         StringBuilder sb = new StringBuilder();
         sb.append(getUser);
         sb.append(user);
@@ -84,20 +85,35 @@ public class login extends AppCompatActivity implements View.OnClickListener{
                 (Request.Method.GET, sb.toString(), null, new Response.Listener< JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        String check = response.toString();
-                        int num = (int) check.charAt(35);
-                        Log.d("num", Integer.toString(num));
-                        if(num != 48) {
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_LONG).show();
+                        Log.d("response", response.toString());
+                        int userID;
+
+                        try {
+                            userID = response.getInt("idUsers");
+                            if(userID != 0) {
+                                Intent intent = new Intent(login.this, MainActivity.class);
+                                intent.putExtra("userID", userID);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
+
+
+
                     }
         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_LONG).show();
-                        Log.d("error", "err");
+                        if(error.networkResponse != null && error.networkResponse.data != null) {
+                            VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                            error = err;
+                        }
+                        Log.d("error", error.toString());
                     }
         });
 

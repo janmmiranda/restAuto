@@ -72,7 +72,7 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        currentOrder = new OrderObject(0,0);
+        currentOrder = new OrderObject(0,0, 0);
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
