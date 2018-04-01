@@ -80,12 +80,12 @@ public class login extends AppCompatActivity implements View.OnClickListener{
         sb.append(user);
         sb.append("&password=");
         sb.append(Password);
-        Log.d("url",sb.toString());
+        //Log.d("url",sb.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, sb.toString(), null, new Response.Listener< JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("response", response.toString());
+                        //Log.d("response", response.toString());
                         int userID;
 
                         try {
@@ -100,10 +100,6 @@ public class login extends AppCompatActivity implements View.OnClickListener{
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-
-
-
                     }
         }, new Response.ErrorListener() {
                     @Override

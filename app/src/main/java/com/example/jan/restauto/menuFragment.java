@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,20 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 
 /**
@@ -36,10 +51,9 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    private TextView floorid;
-    private TextView tableid;
     private Button orderBtn;
+
+    HashMap<String, Double> menuList = new HashMap<>();
     ListView mlv;
 
     private FragmentManager fm;
@@ -90,23 +104,16 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
+
+
         String[] food={"Item A     price","Item B      price","Item C      price","Item D       price","Item E      price","Item F      price","Item G      price"};
         ListAdapter ma= new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_checked,food);
         mlv=(ListView) view.findViewById(R.id.menuList);
         mlv.setAdapter(ma);
 
-        /*just for checking, you can remove below
-        floorid = view.findViewById(R.id.floorId);
-        tableid = view.findViewById(R.id.tableId);
-        if(currentOrder != null){
-            floorid.setText(String.valueOf(currentOrder.floor));
-            tableid.setText(String.valueOf(currentOrder.table));
-        } else {
-            floorid.setText("0");
-            tableid.setText("0");
-        }
-        just for checking, you can remove above
-        */
+
+
+        getMenu();
 
         //this button passes currentOrder into the next fragment
         orderBtn = view.findViewById(R.id.orderBtn);
@@ -118,6 +125,50 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
         });
 
         return view;
+    }
+
+    public void getMenu() {
+        Log.d("menu", "menu called");
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        String getMenu = "http://10.0.2.2:8080/get_menu";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, getMenu, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //Log.d("response", "response");
+                            JSONArray menu = response.getJSONArray("get_menu");
+                            int size = menu.length();
+                            JSONObject item;
+                            for (int i = 0; i < size; i++) {
+                                item = menu.getJSONObject(i);
+                                menuList.put(item.getString("name"), (Double) item.get("price"));
+
+                                //Log.d("price: ", item.get("price").toString());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        /*
+                        Insert into listview here
+                        */
+                        //Log.d("size of menu: ", "size: " + menuList.size());
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if(error.networkResponse != null && error.networkResponse.data != null) {
+                            VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                            error = err;
+                        }
+                        Log.d("error", error.toString());
+                    }
+                });
+
+        queue.add(jsonObjectRequest);
+
     }
 
     private void orderNext(){
