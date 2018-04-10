@@ -1,9 +1,11 @@
 package com.example.jan.restauto;
 
+import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -139,7 +142,7 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "update clicked", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "update clicked", Toast.LENGTH_SHORT).show();
 
                 try {
                     updateTable(floorNum, tableNum, status);
@@ -153,12 +156,13 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*
                 Toast.makeText(getContext(), "next clicked", Toast.LENGTH_LONG).show();
                 try {
                     updateTable(floorNum, tableNum, status);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                } */
                 next(floorNum, tableNum);
             }
         });
@@ -179,34 +183,61 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
         fragmentTransaction.commit();
     }
 
-    private void updateTable(int floorNum, int tableNum, String status) throws IOException {
+    @SuppressLint("StaticFieldLeak")
+    private void updateTable(final int floorNum, final int tableNum, final String status) throws IOException {
+        final Socket[] clientSocket = {null};
+        final String serverHostName = "172.31.221.108";
+        final int port = 1234;
+
+
+        new Thread(new Runnable(){
+            public void run(){
+                //open socket
+                try {
+                    clientSocket[0] = new Socket(serverHostName, port);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("Floor: ");
+                sb.append(floorNum);
+                sb.append(" , table: ");
+                sb.append(tableNum);
+                sb.append(" , status: ");
+                sb.append(status);
+
+                PrintStream printStream = null;
+                try {
+                    printStream = new PrintStream(clientSocket[0].getOutputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                InputStreamReader inputStream = null;
+                try {
+                    inputStream = new InputStreamReader(clientSocket[0].getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                printStream.print(sb.toString());
+                BufferedReader bufferedReader = new BufferedReader(inputStream);
+                String message = null;
+                try {
+                    message = bufferedReader.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("received", "message received " + message);
+            }
+        }).start();
+
         //talk to desktop via socket
-        /*Socket clientSocket = null;
-        String serverHostName = "172.31.155.62";
-        int port = 1234;
-        try {
-            clientSocket = new Socket(serverHostName, port);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Floor: ");
-        sb.append(floorNum);
-        sb.append(" , table: ");
-        sb.append(tableNum);
-        sb.append(" , status: ");
-        sb.append(status);
 
-        PrintStream printStream = new PrintStream(clientSocket.getOutputStream());
-        InputStreamReader inputStream = new InputStreamReader(clientSocket.getInputStream());
 
-        printStream.print(sb);
-        BufferedReader bufferedReader = new BufferedReader(inputStream);
-        String message = bufferedReader.readLine();
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        */
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
