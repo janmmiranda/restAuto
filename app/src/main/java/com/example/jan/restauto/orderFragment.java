@@ -1,15 +1,27 @@
 package com.example.jan.restauto;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import com.braintreepayments.api.BraintreeFragment;
+import com.braintreepayments.api.dropin.DropInActivity;
+import com.braintreepayments.api.dropin.DropInRequest;
+import com.braintreepayments.api.dropin.DropInResult;
+import com.braintreepayments.api.exceptions.InvalidArgumentException;
+import com.braintreepayments.api.models.PaymentMethodNonce;
 
 
 /**
@@ -29,7 +41,12 @@ public class orderFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private Button payBtn;
     ListView mListView;
+    private String clientToken = "sandbox_tgrkgfp7_fjshk9xnbdgzmsvt";
+    int REQUEST_CODE;
+    BraintreeFragment mBraintreeFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -62,6 +79,13 @@ public class orderFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        try {
+            mBraintreeFragment = BraintreeFragment.newInstance(getActivity(), "sandbox_tgrkgfp7_fjshk9xnbdgzmsvt");
+            // mBraintreeFragment is ready to use!
+        } catch (InvalidArgumentException e) {
+            // There was an issue with your authorization string.
+            Log.e("error","errore: " + e);
+        }
     }
 
     @Override
@@ -78,7 +102,43 @@ public class orderFragment extends Fragment {
         mListView=(ListView) view.findViewById(R.id.allOrdersList);
         mListView.setAdapter(mAdapter2);
         // Inflate the layout for this fragment
+        payBtn = view.findViewById(R.id.payBtn);
+        payBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DropInRequest dropInRequest = new DropInRequest()
+                        .clientToken(clientToken);
+
+                startActivityForResult(dropInRequest.getIntent(getContext()), REQUEST_CODE);
+            }
+        });
         return view;
+    }
+
+/*
+    378282246310005
+    public void onBraintreeSubmit(View v) {
+
+        DropInRequest dropInRequest = new DropInRequest()
+                .clientToken(clientToken);
+
+        startActivityForResult(dropInRequest.getIntent(getContext()), REQUEST_CODE);
+    }
+*/
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
+                // use the result to update your UI and send the payment method nonce to your server
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // the user canceled
+            } else {
+                // handle errors here, an exception may be available in
+                Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

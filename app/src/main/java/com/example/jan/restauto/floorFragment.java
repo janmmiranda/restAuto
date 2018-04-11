@@ -186,9 +186,8 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     @SuppressLint("StaticFieldLeak")
     private void updateTable(final int floorNum, final int tableNum, final String status) throws IOException {
         final Socket[] clientSocket = {null};
-        final String serverHostName = "172.31.221.108";
+        final String serverHostName = "96.63.208.158";
         final int port = 1234;
-
 
         new Thread(new Runnable(){
             public void run(){
