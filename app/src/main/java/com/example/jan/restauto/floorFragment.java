@@ -100,7 +100,6 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_floor, container, false);
-        // Inflate the layout for this fragment
         floorSpin = view.findViewById(R.id.floorSpinner);
         floorSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
