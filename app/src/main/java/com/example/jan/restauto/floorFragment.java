@@ -100,7 +100,6 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_floor, container, false);
-        // Inflate the layout for this fragment
         floorSpin = view.findViewById(R.id.floorSpinner);
         floorSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -186,9 +185,8 @@ public class floorFragment extends Fragment implements menuFragment.OnFragmentIn
     @SuppressLint("StaticFieldLeak")
     private void updateTable(final int floorNum, final int tableNum, final String status) throws IOException {
         final Socket[] clientSocket = {null};
-        final String serverHostName = "172.31.221.108";
+        final String serverHostName = "96.63.208.158";
         final int port = 1234;
-
 
         new Thread(new Runnable(){
             public void run(){
