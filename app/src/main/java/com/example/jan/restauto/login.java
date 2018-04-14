@@ -73,7 +73,10 @@ public class login extends AppCompatActivity implements View.OnClickListener{
     }
 
     public void checkUser(String user, final String Password) {
-        RequestQueue queue = Volley.newRequestQueue(this);
+        Intent intent = new Intent(login.this, MainActivity.class);
+        intent.putExtra("userID", 1);
+        startActivity(intent);
+        /*RequestQueue queue = Volley.newRequestQueue(this);
         String getUser = "http://10.0.2.2:8080/get_users?username=";
         StringBuilder sb = new StringBuilder();
         sb.append(getUser);
@@ -114,6 +117,7 @@ public class login extends AppCompatActivity implements View.OnClickListener{
         });
 
         queue.add(jsonObjectRequest);
+        */
     }
 
     public String hashPassword(String password){
