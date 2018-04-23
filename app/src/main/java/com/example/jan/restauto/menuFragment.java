@@ -46,6 +46,7 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -55,6 +56,7 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
 
     HashMap<String, Double> menuList = new HashMap<>();
     ListView mlv;
+    RequestQueue queue;
 
     private FragmentManager fm;
     FragmentTransaction fragmentTransaction;
@@ -98,22 +100,24 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+View view;
+    ListAdapter ma;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_menu, container, false);
+         view = inflater.inflate(R.layout.fragment_menu, container, false);
 
 
         String[] food={"Item A     price","Item B      price","Item C      price","Item D       price","Item E      price","Item F      price","Item G      price"};
-        ListAdapter ma= new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_checked,food);
-        mlv=(ListView) view.findViewById(R.id.menuList);
-        mlv.setAdapter(ma);
+
+
+        mlv= view.findViewById(R.id.menuList);
+       queue = Volley.newRequestQueue(getContext());
+        getmenu();
 
 
 
-        getMenu();
 
         //this button passes currentOrder into the next fragment
         orderBtn = view.findViewById(R.id.orderBtn);
@@ -127,43 +131,57 @@ public class menuFragment extends Fragment implements orderFragment.OnFragmentIn
         return view;
     }
 
-    public void getMenu() {
-        Log.d("menu", "menu called");
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-        String getMenu = "http://10.0.2.2:8080/get_menu";
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, getMenu, null, new Response.Listener<JSONObject>() {
+
+    public void getmenu() {
+        Log.d("menu", "menu called");
+        String getMenu = "http://10.0.2.2:3000/get_menu";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,getMenu,null,new Response.Listener<JSONObject>()
+                {
                     @Override
                     public void onResponse(JSONObject response) {
-                        try {
+                        try{    //its not going through here
                             //Log.d("response", "response");
                             JSONArray menu = response.getJSONArray("get_menu");
                             int size = menu.length();
                             JSONObject item;
-                            for (int i = 0; i < size; i++) {
+                            String[] populate=new String[size];
+                            for (int i = 0; i <menu.length(); i++) {
                                 item = menu.getJSONObject(i);
                                 menuList.put(item.getString("name"), (Double) item.get("price"));
-
+                                String name=item.getString("name");
+                                populate[i]=name;
+                               // ma= new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_checked,populate);
+                                //mlv.setAdapter(ma);
+                                String[] tet={"json","recieved","yayayayya","whooohoooo"};
+                                ma=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,tet);   //testing to see if list view gets updated
+                                mlv.setAdapter(ma);
                                 //Log.d("price: ", item.get("price").toString());
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        /*
-                        Insert into listview here
-                        */
-                        //Log.d("size of menu: ", "size: " + menuList.size());
+
+                        //String[] tet={"json","recieved","yayayayya","whooohoooo"};
+                        //ma=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,tet);
+                        //mlv.setAdapter(ma);
 
                     }
-                }, new Response.ErrorListener() {
+                },
+                new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if(error.networkResponse != null && error.networkResponse.data != null) {
-                            VolleyError err = new VolleyError(new String(error.networkResponse.data));
-                            error = err;
-                        }
-                        Log.d("error", error.toString());
+                    public void onErrorResponse(VolleyError error) {//this is what is being done instead of the json
+                        //if(error.networkResponse != null && error.networkResponse.data != null) {
+                            //VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                            //error = err;
+
+                        String[] tet={"no","json","recieved"};
+                        ma=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,tet);
+                       mlv.setAdapter(ma);
+                        //}
+                       // error.printStackTrace();
+                        //Log.d("error", error.toString());
                     }
                 });
 
