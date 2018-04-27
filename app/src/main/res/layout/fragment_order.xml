@@ -13,7 +13,7 @@
         <ListView
             android:id="@+id/orderedFoodList"
             android:layout_width="600dp"
-            android:layout_height="300dp"
+            android:layout_height="150dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="51dp" />
@@ -21,23 +21,48 @@
         <ListView
             android:id="@+id/allOrdersList"
             android:layout_width="600dp"
-            android:layout_height="300dp"
+            android:layout_height="150dp"
             android:layout_alignStart="@+id/orderedFoodList"
             android:layout_below="@+id/orderedFoodList"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="30dp"
             android:choiceMode="singleChoice" />
 
         <Button
             android:id="@+id/payBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_below="@+id/allOrdersList"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="65dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="16dp"
             android:background="@android:color/holo_blue_dark"
             android:text="Pay"
             android:textColor="@android:color/background_light"
             android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/sendBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/payBtn"
+            android:layout_alignBottom="@+id/payBtn"
+            android:layout_alignStart="@+id/payBtn"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="135dp"
+            android:background="@android:color/holo_blue_dark"
+            android:text="Send"
+            android:textColor="@android:color/background_light"
+            android:textSize="30sp" />
+
+        <ProgressBar
+            android:id="@+id/cookProgress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:progress="0" />
+
 
     </RelativeLayout>
 </FrameLayout>
