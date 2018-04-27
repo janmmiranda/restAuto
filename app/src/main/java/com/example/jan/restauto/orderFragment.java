@@ -217,7 +217,7 @@ public class orderFragment extends Fragment {
                         orderedItem[i] = name + "\t\t\t" + " $" + price;
 
                         mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
-                        mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_checked,orderedItem);
+                        mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItem);
                         mListView1.setAdapter(mListAdapter1);
                     }
                 } catch (JSONException e) {
