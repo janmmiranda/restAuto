@@ -208,7 +208,7 @@ public class orderFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 //update list
-                
+
 
                 //timer & progress bar
                 cookProgress.setProgress(0);
