@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -24,6 +25,7 @@ import android.widget.ProgressBar;
 import android.os.CountDownTimer;
 import android.app.NotificationChannel;
 import android.support.v7.app.AlertDialog;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,6 +43,9 @@ import com.braintreepayments.api.models.PaymentMethodNonce;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Vector;
 
 
 /**
@@ -65,6 +70,7 @@ public class orderFragment extends Fragment {
 
     public ListView mListView1;
     public ListView mListView2;
+    public TextView mTextView;
 
     public ListAdapter mListAdapter1;
     public ListAdapter mListAdapter2;
@@ -83,6 +89,25 @@ public class orderFragment extends Fragment {
 
     public RequestQueue mQueue;
 
+    //GLOBAL DATA VARIABLES
+    int orderIndex;
+    int currFloorID;
+    int currTableID;
+
+    int[] firstItemIndexes;
+    String[] allPossibleOrders;
+    String[] allOrders;
+
+    int[] allPossibleFloorIDs;
+    int[] allPossibleTableIDs;
+    int[] allFloorIDs;
+    int[] allTableIDs;
+
+    String[] orderedItemsMsg;
+    double[] pricesOfItems;
+
+    int[] quantityOfItem;
+    String[] singleItemOfOrder;
 
     private String clientToken = "sandbox_tgrkgfp7_fjshk9xnbdgzmsvt";
     int REQUEST_CODE;
@@ -139,21 +164,30 @@ public class orderFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_order, container, false);
 
-        //JSON Parsing
-        mQueue = Volley.newRequestQueue(getContext());
-        getMenu();
-
         //List of food for chosen order
-        //String[] orderedFood={"Item A     price","Item B      price","Item C      price","Item C      price","Item C      price"};
-        //mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedFood);
-        //mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
-        //mListView1.setAdapter(mAdapter);
+        String[] orderedItemsMsg = {"Item A     price","Item B      price","Item C      price","Item C      price","Item C      price"};
+        mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItemsMsg);
+        mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
+        mListView1.setAdapter(mListAdapter1);
 
         //All orders, with one selected
         String[] allOrders={"Order 1","Order 2","Order 3"};
         mListAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
         mListView2 = (ListView) view.findViewById(R.id.allOrdersList);
         mListView2.setAdapter(mListAdapter2);
+
+        //JSON Parsing - Initial start values
+        mQueue = Volley.newRequestQueue(getContext());
+        getAllOrders();
+
+        //allOrders ListView adapter
+        mListView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                orderIndex = position;
+                getOrder();
+            }
+        });
 
         // Inflate the layout for this fragment
         payBtn = view.findViewById(R.id.payBtn);
@@ -191,12 +225,313 @@ public class orderFragment extends Fragment {
         startActivityForResult(dropInRequest.getIntent(getContext()), REQUEST_CODE);
     }
 */
+public void getAllOrders() {
+    Log.d("allOrders", "orderedItems called");
+    String url = "http://10.0.2.2:8080/get_order";
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>()
+    {
+        @Override
+        public void onResponse(JSONObject response) {
+            try {
+                JSONArray orderedItem = response.getJSONArray("get_order");
+                int size = orderedItem.length();
+                JSONObject item;
+
+                //Find # of orders open
+                int j = 0;
+                for (int i = 0; i < orderedItem.length(); i++) {
+                    item = orderedItem.getJSONObject(i);
+
+                    int uniqueOrderedItemID = item.getInt("uniqueOrderedItemID");
+                    int isFirstItem = item.getInt("isFirstItem");
+                    int isCompleted = item.getInt("isCompleted");
+
+                    if (isCompleted == 0 && isFirstItem == 1){
+                        j++;
+                    }
+                }
+
+                allOrders = new String[j];
+                firstItemIndexes = new int[j+1];
+
+                allFloorIDs = new int[j+1];
+                allTableIDs = new int[j+1];
+                j = 0;
+
+                //Only populate those orders
+                for (int i = 0; i < orderedItem.length(); i++) {
+                    item = orderedItem.getJSONObject(i);
+
+                    int uniqueOrderedItemID = item.getInt("uniqueOrderedItemID");
+                    int waiterID = item.getInt("waiterID");
+                    String itemName = item.getString("itemName");
+                    int quantity = item.getInt("quantity");
+                    int floorID = item.getInt("floorID");
+                    int tableID = item.getInt("tableID");
+                    int isFirstItem = item.getInt("isFirstItem");
+                    int isCompleted = item.getInt("isCompleted");
+                    double priceTimesQty = item.getDouble("priceTimesQty");
+
+                    //USER ID NEEDS TO BE IMPLEMENTED
+                    if (isFirstItem == 1 && isCompleted == 0) {
+                        allOrders[j] = "Order for Floor " + floorID + " at Table " + tableID;
+                        firstItemIndexes[j] = uniqueOrderedItemID;
+                        j++;
+                    }
+                    firstItemIndexes[j] = firstItemIndexes[j-1] + 1; //Anticipates next order's first item
+                }
+
+                //j = 0;
+                //String[] allOrdersArray = new String[j+1];
+                //allOrders.toArray(allOrdersArray);
+
+                mListView2=(ListView) view.findViewById(R.id.allOrdersList);
+                mListAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
+                mListView2.setAdapter(mListAdapter2);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {//this is what is being done instead of the json
+                    //if(error.networkResponse != null && error.networkResponse.data != null) {
+                    //VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                    //error = err;
+
+                    String[] tet={"no","json","received"};
+                    mListView2=(ListView) view.findViewById(R.id.allOrdersList);
+                    mListAdapter2=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_activated_1,tet);
+                    mListView2.setAdapter(mListAdapter2);
+
+                    // error.printStackTrace();
+                    //Log.d("error", error.toString());
+                }
+            });
+
+    mQueue.add(jsonObjectRequest);
+}
+
+    public void getOrder() {
+        Log.d("order", "order called");
+        String url = "http://10.0.2.2:8080/get_order";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>()
+        {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray menu = response.getJSONArray("get_order");
+
+                    int startCounter = firstItemIndexes[orderIndex] - 1;
+                    int nextStart = firstItemIndexes[orderIndex + 1] - 1;
+
+                    int size = nextStart - startCounter;
+                    JSONObject item;
+                    orderedItemsMsg = new String[size];
+                    pricesOfItems = new double[size];
+
+                    quantityOfItem = new int[size];
+                    singleItemOfOrder = new String[size];
+
+                    for (int i = 0; i < size; i++) {
+                        item = menu.getJSONObject(startCounter + i); //parse 0 from firstItemIndex array
+
+                        int uniqueOrderedItemID = item.getInt("uniqueOrderedItemID");
+                        int waiterID = item.getInt("waiterID");
+                        String itemName = item.getString("itemName");
+                        int quantity = item.getInt("quantity");
+                        int floorID = item.getInt("floorID");
+                        int tableID = item.getInt("tableID");
+                        int isFirstItem = item.getInt("isFirstItem");
+                        int isCompleted = item.getInt("isCompleted");
+                        double priceTimesQty = item.getDouble("priceTimesQty");
+                        //getPrice(i, itemName, quantity); //for pricesOfItems[i]
+
+                        //SAVE GLOBAL VARIABLES
+                        quantityOfItem[i] = quantity;
+                        singleItemOfOrder[i] = itemName;
+                        pricesOfItems[i] = priceTimesQty;
+
+                        currFloorID = floorID;
+                        currTableID = tableID;
+
+                        orderedItemsMsg[i] = quantity + " " + itemName + "(s)\t\t\t\t\t\t\t\t" + " $" + String.format( "%.2f", pricesOfItems[i]);
+                    }
+                    mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
+                    mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItemsMsg);
+                    mListView1.setAdapter(mListAdapter1);
+
+                    //Total message
+                    mTextView = (TextView) view.findViewById(R.id.subtotalText);
+                    mTextView.setText("Order Subtotal: $" + String.format( "%.2f", getSubtotal()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {//this is what is being done instead of the json
+                        //if(error.networkResponse != null && error.networkResponse.data != null) {
+                        //VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                        //error = err;
+
+                        String[] tet={"no","json","received"};
+                        mListAdapter1=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,tet);
+                        mListView1.setAdapter(mListAdapter1);
+                        //}
+                        // error.printStackTrace();
+                        //Log.d("error", error.toString());
+                    }
+                });
+
+        mQueue.add(jsonObjectRequest);
+
+    }
+
+    public void getPrices(){
+        Log.d("menu", "menu called");
+        String url = "http://10.0.2.2:8080/get_menu";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>()
+        {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray menu = response.getJSONArray("get_menu");
+                    JSONObject item;
+                    int size = singleItemOfOrder.length;
+
+                    //testing each actual item
+                    for (int i = 0; i < size; i++) {
+                        String actualItemName = singleItemOfOrder[i];
+                        int actualQuantity = quantityOfItem[i];
+
+                        //comparing each menu item
+                        for (int j = 0; j < menu.length(); j++) {
+                            item = menu.getJSONObject(j);
+
+                            int itemId = item.getInt("itemId");
+                            String name = item.getString("name");
+                            String section = item.getString("section");
+                            double price = item.getDouble("price");
+
+                            if (name.equals(actualItemName)) {
+                                pricesOfItems[i] = price * actualQuantity;
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {//this is what is being done instead of the json
+                        //if(error.networkResponse != null && error.networkResponse.data != null) {
+                        //VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                        //error = err;
+
+                        String[] tet={"no","json","received"};
+                        mListAdapter1=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,tet);
+                        mListView1.setAdapter(mListAdapter1);
+                        //}
+                        // error.printStackTrace();
+                        //Log.d("error", error.toString());
+                    }
+                });
+
+        mQueue.add(jsonObjectRequest);
+    }
+
+    public void printOrder(){
+
+        int size = singleItemOfOrder.length;
+
+        for (int i = 0; i < size; i++){
+            orderedItemsMsg[i] = quantityOfItem[i] + " " + singleItemOfOrder[i] + "(s)\t\t\t" + " $" + String.format( "%.2f", pricesOfItems[i]);
+        }
+
+        mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
+        mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItemsMsg);
+        mListView1.setAdapter(mListAdapter1);
+
+        //Total message
+        mTextView = (TextView) view.findViewById(R.id.subtotalText);
+        mTextView.setText("Order Subtotal: $" + String.format( "%.2f", getSubtotal()));
+    }
+
+    public void getPrice(final int index, final String itemName, final int quantity){
+        Log.d("menu", "menu called");
+        String url = "http://10.0.2.2:8080/get_menu";
+
+        JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>()
+        {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray menu = response.getJSONArray("get_menu");
+                    JSONObject item1;
+                    String actualItemName = itemName;
+                    int indexOfActualPriceArray = index;
+                    int actualQuantity = quantity;
+
+                    //testing each menu item
+                    for (int i = 0; i < menu.length(); i++) {
+                        item1 = menu.getJSONObject(i);
+
+                        int itemId = item1.getInt("itemId");
+                        String name = item1.getString("name");
+                        String section = item1.getString("section");
+                        double price = item1.getDouble("price");
+
+                        if (name.equals(actualItemName)){
+                            pricesOfItems[indexOfActualPriceArray] = price * actualQuantity;
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {//this is what is being done instead of the json
+                        //if(error.networkResponse != null && error.networkResponse.data != null) {
+                        //VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                        //error = err;
+
+                        String[] tet={"no","json","received"};
+                        mListAdapter1=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,tet);
+                        mListView1.setAdapter(mListAdapter1);
+                        //}
+                        // error.printStackTrace();
+                        //Log.d("error", error.toString());
+                    }
+                });
+
+        mQueue.add(jsonObjectRequest1);
+    }
+
+    public double getSubtotal(){
+        int size = pricesOfItems.length;
+        double subtotal = 0;
+
+        for (int i = 0; i < size; i++){
+            subtotal += pricesOfItems[i];
+        }
+        return subtotal;
+    }
 
     public void getMenu() {
         Log.d("menu", "menu called");
-        String getMenu = "http://10.0.2.2:8080/get_menu";
+        String url = "http://10.0.2.2:8080/get_menu";
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,getMenu,null,new Response.Listener<JSONObject>()
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>()
         {
             @Override
             public void onResponse(JSONObject response) {
@@ -215,11 +550,11 @@ public class orderFragment extends Fragment {
                         double price = item.getDouble("price");
 
                         orderedItem[i] = name + "\t\t\t" + " $" + price;
-
-                        mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
-                        mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItem);
-                        mListView1.setAdapter(mListAdapter1);
                     }
+                    mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
+                    mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItem);
+                    mListView1.setAdapter(mListAdapter1);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -334,7 +669,7 @@ public class orderFragment extends Fragment {
         notification.setTicker("Kitchen has finished an order");
         notification.setWhen(System.currentTimeMillis());
         notification.setContentTitle("Restaurant Automation");
-        notification.setContentText("order + orderID + for  + tableID + is ready for pickup");
+        notification.setContentText("Order for Floor " + currFloorID + " at Table " + currTableID + " is ready for pickup.");
         //notification.setPriority(2);
         notification.setOnlyAlertOnce(true);
 
@@ -352,7 +687,7 @@ public class orderFragment extends Fragment {
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Kitchen finished an order");
-        builder.setMessage("order for  + tableID +  is ready for pickup");
+        builder.setMessage("Order for Floor " + currFloorID + " at Table " + currTableID + " is ready for pickup.");
 
         // add a button
         builder.setPositiveButton("OK", null);

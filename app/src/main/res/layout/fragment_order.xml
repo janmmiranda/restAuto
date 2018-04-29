@@ -31,11 +31,9 @@
             android:id="@+id/payBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/allOrdersList"
-            android:layout_centerVertical="true"
+            android:layout_below="@+id/subtotalText"
+            android:layout_marginTop="13dp"
             android:layout_marginStart="80dp"
-            android:layout_marginTop="16dp"
             android:background="@android:color/holo_blue_dark"
             android:text="Pay"
             android:textColor="@android:color/background_light"
@@ -47,9 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/payBtn"
             android:layout_alignBottom="@+id/payBtn"
-            android:layout_alignStart="@+id/payBtn"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="135dp"
+            android:layout_marginStart="210dp"
             android:background="@android:color/holo_blue_dark"
             android:text="Send"
             android:textColor="@android:color/background_light"
@@ -62,6 +58,16 @@
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:progress="0" />
+
+        <TextView
+            android:id="@+id/subtotalText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/allOrdersList"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="Order Subtotal: $0.00"
+            android:textSize="20sp" />
 
 
     </RelativeLayout>
