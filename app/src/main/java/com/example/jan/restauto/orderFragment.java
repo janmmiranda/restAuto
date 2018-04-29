@@ -207,6 +207,9 @@ public class orderFragment extends Fragment {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //update list
+
+
                 //timer & progress bar
                 cookProgress.setProgress(0);
                 cookProgressSim(15000, 150);
@@ -276,10 +279,10 @@ public void getAllOrders() {
                     //USER ID NEEDS TO BE IMPLEMENTED
                     if (isFirstItem == 1 && isCompleted == 0) {
                         allOrders[j] = "Order for Floor " + floorID + " at Table " + tableID;
-                        firstItemIndexes[j] = uniqueOrderedItemID;
+                        firstItemIndexes[j] = i;
                         j++;
                     }
-                    firstItemIndexes[j] = firstItemIndexes[j-1] + 1; //Anticipates next order's first item
+                    //firstItemIndexes[j] = firstItemIndexes[j-1] + 1; //Anticipates next order's first item
                 }
 
                 //j = 0;
@@ -324,18 +327,29 @@ public void getAllOrders() {
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray menu = response.getJSONArray("get_order");
-
-                    int startCounter = firstItemIndexes[orderIndex] - 1;
-                    int nextStart = firstItemIndexes[orderIndex + 1] - 1;
-
-                    int size = nextStart - startCounter;
                     JSONObject item;
+                    int startCounter = firstItemIndexes[orderIndex];
+
+                    //int nextStart = firstItemIndexes[orderIndex + 1] - 1;
+                    //int size = nextStart - startCounter;
+
+                    //get size of order
+                    int size = 0;
+                    int testFirst;
+                    do {
+                        size++;
+                        item = menu.getJSONObject(startCounter + size); //parse 0 from firstItemIndex array
+
+                        testFirst = item.getInt("isFirstItem");
+                    } while(testFirst == 0);
+
                     orderedItemsMsg = new String[size];
+
+                    singleItemOfOrder = new String[size];
+                    quantityOfItem = new int[size];
                     pricesOfItems = new double[size];
 
-                    quantityOfItem = new int[size];
-                    singleItemOfOrder = new String[size];
-
+                    //Get order
                     for (int i = 0; i < size; i++) {
                         item = menu.getJSONObject(startCounter + i); //parse 0 from firstItemIndex array
 
