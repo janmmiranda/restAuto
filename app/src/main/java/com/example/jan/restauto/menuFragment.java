@@ -131,7 +131,7 @@ View view;
         tv= view.findViewById(R.id.test2);
 
         mlv= view.findViewById(R.id.menuList);
-        ba=view.findViewById(R.id.btn);
+       // ba=view.findViewById(R.id.btn);
 
        queue = Volley.newRequestQueue(getContext());
         getmenu();
@@ -168,12 +168,12 @@ View view;
                 orderNext();
             }
         });
-        ba.setOnClickListener(new View.OnClickListener() {
+       /* ba.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ButtonClick(view);
             }
-        });
+        });*/
 
 
 
@@ -184,7 +184,7 @@ View view;
 
     int notify;
 
-    private void ButtonClick(View view) {
+    /*private void ButtonClick(View view) {
 
 
 
@@ -204,7 +204,7 @@ View view;
                 String split1[]=split[1].split("\t\t\t");
                 String price=split1[0];
                 String name=split1[1];
-                String amt=String.valueOf( adapt.editModelArrayList.get(i).getEditTextValue() /*+System.getProperty("line.separator")*/);
+                String amt=String.valueOf( adapt.editModelArrayList.get(i).getEditTextValue() *//*+System.getProperty("line.separator")*//*);
                 check[2]=amt;
                 checkd_itms=checkd_itms+1;
                 float q=Float.parseFloat(amt);
@@ -244,7 +244,7 @@ View view;
         }
 
         //tv.setText(check[2]);
-    }
+    }*/
     EditModel editModel;
     private ArrayList<EditModel> populateList(){
 
@@ -342,6 +342,10 @@ View view;
                 String name=split1[1];
                 String amt=String.valueOf( adapt.editModelArrayList.get(i).getEditTextValue() /*+System.getProperty("line.separator")*/);
                 check[2]=amt;
+                String floor,waiter,table;
+                floor = String.valueOf(currentOrder.floor);
+                waiter= String.valueOf(currentOrder.userID);
+                table = String.valueOf(currentOrder.table);
                 checkd_itms=checkd_itms+1;
                 float q=Float.parseFloat(amt);
                 if (q==0)
@@ -363,11 +367,11 @@ View view;
                     }
 
 
-                    data.put("waiterID", "1");
+                    data.put("waiterID",waiter);
                     data.put("itemName", name);
                     data.put("quantity", amt);
-                    data.put("floorID", "1");
-                    data.put("tableID", "5");
+                    data.put("floorID", floor);
+                    data.put("tableID", table);
                     data.put("isFirstItem", first);
                     data.put("isCompleted", "0");
                     data.put("priceTimesQty", cost);
