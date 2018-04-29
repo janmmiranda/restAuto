@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.widget.RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/edName"
+        android:layout_width="50dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="9dp"
+        android:layout_toEndOf="@+id/tvPosition"
+        android:ems="10"
+        android:inputType="number"
+        android:textSize="10sp"
+        tools:layout_editor_absoluteX="4dp"
+        tools:layout_editor_absoluteY="3dp"/>
+
+
+
+    <!--  <CheckBox
+          android:id="@+id/cbShowName"
+          android:layout_width="40dp"
+          android:layout_height="30dp"
+          android:layout_alignParentStart="true"
+          android:layout_alignParentTop="true"/>
+
+      <TextView
+          android:id="@+id/tvPosition"
+          android:layout_width="wrap_content"
+          android:layout_height="30dp"
+          android:layout_alignTop="@+id/cbShowName"
+          android:layout_marginStart="8dp"
+          android:layout_toEndOf="@+id/cbShowName"
+          android:text="TextView"/>-->
+</android.widget.RelativeLayout>
