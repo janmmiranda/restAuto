@@ -71,6 +71,7 @@ public class orderFragment extends Fragment {
     public ListView mListView1;
     public ListView mListView2;
     public TextView mTextView;
+    TextView mProgressTextView;
 
     public ListAdapter mListAdapter1;
     public ListAdapter mListAdapter2;
@@ -165,7 +166,7 @@ public class orderFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_order, container, false);
 
         //List of food for chosen order
-        String[] orderedItemsMsg = {"Item A     price","Item B      price","Item C      price","Item C      price","Item C      price"};
+        String[] orderedItemsMsg = {"Click on an order to view"};
         mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItemsMsg);
         mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
         mListView1.setAdapter(mListAdapter1);
@@ -180,10 +181,16 @@ public class orderFragment extends Fragment {
         mQueue = Volley.newRequestQueue(getContext());
         getAllOrders();
 
+        //Default order
+        //orderIndex = firstItemIndexes.length - 1;
+        //mListView2.setSelection(firstItemIndexes.length - 1);
+        getOrder();
+
         //allOrders ListView adapter
         mListView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                sendBtn.setEnabled(true);
                 orderIndex = position;
                 getOrder();
             }
@@ -208,9 +215,25 @@ public class orderFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 //update list
+                int[] temp = new int[firstItemIndexes.length - 1];
+                int key = orderIndex;
 
+                //copy prior to key
+                for (int i = 0; i < orderIndex; i++){
+                    temp[i] = firstItemIndexes[i];
+                }
+                //copy after key
+                for (int i = key; i < temp.length;i++){
+                    temp[key] = firstItemIndexes[i+1];
+                }
+                firstItemIndexes = new int[temp.length];
+                firstItemIndexes = temp.clone();
+                //updateAllOrders();
 
                 //timer & progress bar
+                //mProgressTextView = (TextView) view.findViewById(R.id.progressText);
+                //mProgressTextView.setText("Order for Floor " + currFloorID + ", Table " + currTableID + " is cooking"); <-- CAUSES ERROR
+
                 cookProgress.setProgress(0);
                 cookProgressSim(15000, 150);
             }
@@ -228,6 +251,95 @@ public class orderFragment extends Fragment {
         startActivityForResult(dropInRequest.getIntent(getContext()), REQUEST_CODE);
     }
 */
+
+public void updateAllOrders(){
+        Log.d("allOrders", "orderedItems called");
+        String url = "http://10.0.2.2:8080/get_order";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,new Response.Listener<JSONObject>()
+        {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray orderedItem = response.getJSONArray("get_order");
+                    int size = orderedItem.length();
+                    JSONObject item;
+
+                    //Find # of orders open
+                    //int j = 0;
+                    //for (int i = 0; i < orderedItem.length(); i++) {
+                    //    item = orderedItem.getJSONObject(i);
+
+                    //    int uniqueOrderedItemID = item.getInt("uniqueOrderedItemID");
+                    //    int isFirstItem = item.getInt("isFirstItem");
+                    //    int isCompleted = item.getInt("isCompleted");
+
+                    //    if (isCompleted == 0 && isFirstItem == 1){
+                    //       j++;
+                    //    }
+                    //}
+
+                    allOrders = new String[firstItemIndexes.length];
+
+                    allFloorIDs = new int[firstItemIndexes.length];
+                    allTableIDs = new int[firstItemIndexes.length];
+                    int j = 0;
+
+                    //Only populate those orders
+                    for (int i = 0; i < orderedItem.length(); i++) {
+                        item = orderedItem.getJSONObject(i);
+
+                        int uniqueOrderedItemID = item.getInt("uniqueOrderedItemID");
+                        int waiterID = item.getInt("waiterID");
+                        String itemName = item.getString("itemName");
+                        int quantity = item.getInt("quantity");
+                        int floorID = item.getInt("floorID");
+                        int tableID = item.getInt("tableID");
+                        int isFirstItem = item.getInt("isFirstItem");
+                        int isCompleted = item.getInt("isCompleted");
+                        double priceTimesQty = item.getDouble("priceTimesQty");
+
+                        //USER ID NEEDS TO BE IMPLEMENTED
+                        if (i == firstItemIndexes[j]) {
+                            allOrders[j] = "Order for Floor " + floorID + " at Table " + tableID;
+                            //firstItemIndexes[j] = i;
+                            j++;
+                        }
+                        //firstItemIndexes[j] = firstItemIndexes[j-1] + 1; //Anticipates next order's first item
+                    }
+
+                    //j = 0;
+                    //String[] allOrdersArray = new String[j+1];
+                    //allOrders.toArray(allOrdersArray);
+
+                    mListView2=(ListView) view.findViewById(R.id.allOrdersList);
+                    mListAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
+                    mListView2.setAdapter(mListAdapter2);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {//this is what is being done instead of the json
+                        //if(error.networkResponse != null && error.networkResponse.data != null) {
+                        //VolleyError err = new VolleyError(new String(error.networkResponse.data));
+                        //error = err;
+
+                        String[] tet={"no","json","received"};
+                        mListView2=(ListView) view.findViewById(R.id.allOrdersList);
+                        mListAdapter2=new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_activated_1,tet);
+                        mListView2.setAdapter(mListAdapter2);
+
+                        // error.printStackTrace();
+                        //Log.d("error", error.toString());
+                    }
+                });
+
+        mQueue.add(jsonObjectRequest);
+    }
+
 public void getAllOrders() {
     Log.d("allOrders", "orderedItems called");
     String url = "http://10.0.2.2:8080/get_order";
@@ -289,6 +401,9 @@ public void getAllOrders() {
                 //String[] allOrdersArray = new String[j+1];
                 //allOrders.toArray(allOrdersArray);
 
+                //Default order
+                orderIndex = firstItemIndexes.length - 1;
+
                 mListView2=(ListView) view.findViewById(R.id.allOrdersList);
                 mListAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
                 mListView2.setAdapter(mListAdapter2);
@@ -335,13 +450,29 @@ public void getAllOrders() {
 
                     //get size of order
                     int size = 0;
-                    int testFirst;
-                    do {
-                        size++;
-                        item = menu.getJSONObject(startCounter + size); //parse 0 from firstItemIndex array
+                    int testFirst = 0;
 
+                    //for first element
+                    if ((menu.length()) == startCounter + 1){
+                        testFirst = 1; //skip loop if last element is first and only in current order
+                    }
+
+                    do{
+                        size++;
+
+                        //if past last element of menu
+                        if ((menu.length()) == startCounter + size){
+                            break;
+                        }
+
+                        item = menu.getJSONObject(startCounter + size); //parse from firstItemIndex array
                         testFirst = item.getInt("isFirstItem");
                     } while(testFirst == 0);
+
+                    //if last order of menu
+                    //if (startCounter == firstItemIndexes[firstItemIndexes.length - 1]){
+                    //    size++;
+                    //}
 
                     orderedItemsMsg = new String[size];
 
@@ -652,6 +783,10 @@ public void getAllOrders() {
             public void onFinish() {
                 //notification heads-up: "order for " + tableID + " is ready for pickup"
                 cookProgress.incrementProgressBy(1);
+
+                mProgressTextView = (TextView) view.findViewById(R.id.progressText);
+                mProgressTextView.setText("Order for Floor " + currFloorID + ", Table " + currTableID + " finished");
+
                 cookingFinishedNotif(view);
             }
         }.start();

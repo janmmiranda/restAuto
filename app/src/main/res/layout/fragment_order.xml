@@ -46,6 +46,7 @@
             android:layout_alignBaseline="@+id/payBtn"
             android:layout_alignBottom="@+id/payBtn"
             android:layout_marginStart="210dp"
+            android:enabled="false"
             android:background="@android:color/holo_blue_dark"
             android:text="Send"
             android:textColor="@android:color/background_light"
@@ -69,6 +70,14 @@
             android:text="Order Subtotal: $0.00"
             android:textSize="20sp" />
 
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/cookProgress"
+            android:layout_centerHorizontal="true"
+            android:text="Cooking Progress"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 </FrameLayout>
