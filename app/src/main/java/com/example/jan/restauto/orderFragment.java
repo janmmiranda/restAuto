@@ -498,10 +498,19 @@ public class orderFragment extends Fragment {
                         singleItemOfOrder[i] = itemName;
                         pricesOfItems[i] = priceTimesQty;
 
+                        //spacing
+                        if (itemName.length() <45){
+
+                            if (quantity > 1){itemName = itemName + "s";}
+                            for (int letter = itemName.length(); letter < 45; letter++){
+                                itemName = itemName + " ";
+                            }
+                        }
+
                         currFloorID = floorID;
                         currTableID = tableID;
 
-                        orderedItemsMsg[i] = quantity + " " + itemName + "(s)\t\t\t\t\t\t\t\t" + " $" + String.format( "%.2f", pricesOfItems[i]);
+                        orderedItemsMsg[i] = quantity + " " + itemName + "\t\t\t\t\t\t\t\t" + " $" + String.format( "%.2f", pricesOfItems[i]);
                     }
                     mListView1=(ListView) view.findViewById(R.id.orderedFoodList);
                     mListAdapter1 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,orderedItemsMsg);
