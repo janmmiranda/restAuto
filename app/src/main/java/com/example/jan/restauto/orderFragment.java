@@ -78,9 +78,6 @@ public class orderFragment extends Fragment {
     public ListAdapter mListAdapter2;
     public ArrayAdapter mArrayAdapter;
 
-    //public String[] orderedFood;
-    //public String[] allOrders;
-
     private Button payBtn;
     private Button sendBtn;
 
@@ -97,19 +94,16 @@ public class orderFragment extends Fragment {
     int currTableID;
 
     int[] firstItemIndexes;
-    String[] allPossibleOrders;
     String[] allOrders;
 
-    int[] allPossibleFloorIDs;
-    int[] allPossibleTableIDs;
     int[] allFloorIDs;
     int[] allTableIDs;
 
     String[] orderedItemsMsg;
-    double[] pricesOfItems;
-
-    int[] quantityOfItem;
     String[] singleItemOfOrder;
+    double[] pricesOfItems;
+    int[] quantityOfItem;
+
 
     private String clientToken = "sandbox_tgrkgfp7_fjshk9xnbdgzmsvt";
     int REQUEST_CODE;
