@@ -34,6 +34,7 @@
             android:layout_below="@+id/subtotalText"
             android:layout_marginTop="13dp"
             android:layout_marginStart="80dp"
+            android:enabled="false"
             android:background="@android:color/holo_blue_dark"
             android:text="Pay"
             android:textColor="@android:color/background_light"
