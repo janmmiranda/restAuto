@@ -76,7 +76,6 @@ public class orderFragment extends Fragment {
 
     public ListAdapter mListAdapter1;
     public ListAdapter mListAdapter2;
-    public ArrayAdapter mArrayAdapter;
 
     private Button payBtn;
     private Button sendBtn;
@@ -95,6 +94,7 @@ public class orderFragment extends Fragment {
 
     int[] firstItemIndexes;
     String[] allOrders;
+    List<String> allOrdersMsg;
 
     int[] allFloorIDs;
     int[] allTableIDs;
@@ -104,6 +104,7 @@ public class orderFragment extends Fragment {
     double[] pricesOfItems;
     int[] quantityOfItem;
 
+    int[] tempAll;
 
     private String clientToken = "sandbox_tgrkgfp7_fjshk9xnbdgzmsvt";
     int REQUEST_CODE;
@@ -219,7 +220,7 @@ public class orderFragment extends Fragment {
                 }
                 //copy after key
                 for (int i = key; i < temp.length; i++){
-                    temp[key] = firstItemIndexes[i+1];
+                    temp[i] = firstItemIndexes[i+1];
                 }
                 firstItemIndexes = new int[temp.length];
 
@@ -227,7 +228,7 @@ public class orderFragment extends Fragment {
                     firstItemIndexes[i] = temp[i];
                 }
 
-                //updateAllOrders();
+                updateAllOrders();
 
 
                 //timer & progress bar
@@ -280,6 +281,7 @@ public class orderFragment extends Fragment {
                     //}
 
                     allOrders = new String[firstItemIndexes.length];
+                    //String[] tempAll = new String[firstItemIndexes.length];
 
                     int j = 0;
 
@@ -298,6 +300,13 @@ public class orderFragment extends Fragment {
                         }
                         //firstItemIndexes[j] = firstItemIndexes[j-1] + 1; //Anticipates next order's first item
                     }
+
+                    mListView2=(ListView) view.findViewById(R.id.allOrdersList);
+                    mListAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
+                    mListView2.setAdapter(mListAdapter2);
+
+                    //((ArrayAdapter) mListView2.getAdapter()).notifyDataSetChanged();
+
 
                     //j = 0;
                     //String[] allOrdersArray = new String[j+1];
@@ -393,6 +402,8 @@ public class orderFragment extends Fragment {
 
                     //Default order
                     orderIndex = firstItemIndexes.length - 1;
+
+                    //allOrdersMsg = Arrays.asList(allOrders);
 
                     mListView2=(ListView) view.findViewById(R.id.allOrdersList);
                     mListAdapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_activated_1,allOrders);
